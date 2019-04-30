@@ -119,67 +119,69 @@ y = np.log1p(y)
 sns.distplot(y , fit=norm);
 
 # Get the fitted parameters used by the function
-(mu, sigma) = norm.fit(train_dataset['SalePrice'])
+(mu, sigma) = norm.fit(y)
 print( '\n mu = {:.2f} and sigma = {:.2f}\n'.format(mu, sigma))
 
 #Now plot the distribution
 plt.legend(['Normal dist. ($\mu=$ {:.2f} and $\sigma=$ {:.2f} )'.format(mu, sigma)],
             loc='best')
 plt.ylabel('Frequency')
-plt.title('SalePrice distribution')
+plt.title('CLTV distribution')
 
 # #Get also the QQ-plot
 # fig = plt.figure()
 # res = stats.probplot(train_dataset['SalePrice'], plot=plt)
 # plt.show()
 
-def regression_Modeling(X,y):
     
    
-    # split training set and test set
+# split training set and test set
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
+# instantiate
+linreg = LinearRegression()
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+# fit the model to the training data (learn the coefficients)
+linreg.fit(X_train, y_train)
 
+# make predictions on the testing set
+y_pred = linreg.predict(X_test)
 
-    # instantiate
-    linreg = LinearRegression()
+# print the intercept and coefficients
+print(linreg.intercept_)
+print(linreg.coef_)
 
-    # fit the model to the training data (learn the coefficients)
-    linreg.fit(X_train, y_train)
+# R squared
+# Value of R-squared lies between 0 and 1.
+# Higher value or R-squared is considered better because it indicates the larger variance explained by the model.
+from sklearn import metrics
 
-    # make predictions on the testing set
-    y_pred = linreg.predict(X_test)
+# compute the R Square for model
+print("R-Square:", metrics.r2_score(y_test, y_pred))
 
-    # print the intercept and coefficients
-    print(linreg.intercept_)
-    print(linreg.coef_)
-
-    # R squared
-    # Value of R-squared lies between 0 and 1.
-    # Higher value or R-squared is considered better because it indicates the larger variance explained by the model.
-    from sklearn import metrics
-
-    # compute the R Square for model
-    print("R-Square:", metrics.r2_score(y_test, y_pred))
-
-    # This model has a higher R-squared (0.96). This model provides a better fit to the data.
+# This model has a higher R-squared (0.96). This model provides a better fit to the data.
 
     #
-    # Model Evaluation
-    # For regression problems following evaluation metrics used (Ritchie Ng):
-    #
-    # Mean Absolute Error (MAE) is the mean of the absolute value of the errors.
-    # Mean Squared Error (MSE) is the mean of the squared errors.
-    # Root Mean Squared Error (RMSE) is the square root of the mean of the squared errors.
+# Model Evaluation
+# For regression problems following evaluation metrics used (Ritchie Ng):
+#
+# Mean Absolute Error (MAE) is the mean of the absolute value of the errors.
+# Mean Squared Error (MSE) is the mean of the squared errors.
+# Root Mean Squared Error (RMSE) is the square root of the mean of the squared errors.
 
-    # calculate MAE using scikit-learn
-    print("MAE:", metrics.mean_absolute_error(y_test, y_pred))
+# calculate MAE using scikit-learn
+print("MAE:", metrics.mean_absolute_error(y_test, y_pred))
 
-    # calculate mean squared error
-    print("MSE", metrics.mean_squared_error(y_test, y_pred))
-    # compute the RMSE of our predictions
-    print("RMSE:", np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
-    # RMSE is more popular than MSE and MAE because RMSE is interpretable with y because of the same units.
+# calculate mean squared error
+print("MSE", metrics.mean_squared_error(y_test, y_pred))
+# compute the RMSE of our predictions
+print("RMSE:", np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+# RMSE is more popular than MSE and MAE because RMSE is interpretable with y because of the same units.
 
-regression_Modeling(X,y)
+
+def predict_for_new_customer(r,m,f):
+    d = {'recency': [r], 'monetary': [m], 'frequency':[f]}
+    listdf = pd.DataFrame(data=d)
+
+    linreg.predict(listdf)
+predict_for_new_customer(8065,1,100)

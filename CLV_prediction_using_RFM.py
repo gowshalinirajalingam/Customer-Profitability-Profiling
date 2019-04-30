@@ -50,7 +50,7 @@ data_filtered['TransDate'] = pd.to_datetime(data_filtered['TransDate'])
 
 
 
-rfm= data_filtered.groupby('CID').agg({'TransDate': lambda date: (PRESENT - date.max()).days,
+rfm= data_filtered.groupby('CID',as_index=False).agg({'TransDate': lambda date: (PRESENT - date.max()).days,
                                         'TransNo': lambda num: len(num),
                                         'Revenue': lambda Reve: Reve.sum()})
 
@@ -123,6 +123,17 @@ rfm.sort_values('RFM_Score', ascending=False).head()
 #TODO :for X add customer demographic data too.
 X=rfm[['r_quartile','f_quartile','m_quartile']]
 y=rfm[['RFM_Score']]
+
+
+# Explotary Analysis
+# plot a graph
+ax=rfm.groupby('RFM_Score').count().plot(kind='bar', colormap='copper_r')
+ax.set_xlabel("RFM Score")
+ax.set_ylabel("Count of customers")
+
+#sort
+beforesortdf=pd.DataFrame(rfm.groupby('RFM_Score',as_index=False).agg('monetary').mean())
+aftersortdf=beforesortdf.sort_values(['monetary'], ascending=[True])
 
 
 # predictive model building
